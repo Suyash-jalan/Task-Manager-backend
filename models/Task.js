@@ -8,8 +8,8 @@ const taskschema = mongoose.Schema({
     },
     folderId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'folder',
-        requires: true
+        ref: 'Folder',
+        required: true
     },
     title: {
         type: String,
@@ -33,7 +33,7 @@ const taskschema = mongoose.Schema({
     tags: [String]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Task', taskschema);
+module.exports = mongoose.model('tasks', taskschema);
 
 
 

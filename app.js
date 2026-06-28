@@ -7,6 +7,10 @@ const mongoose = require("mongoose");
 
 const authRouter = require('./routes/auth');
 const authController = require('./controllers/authController');
+const folderController = require('./controllers/folderController');
+const folderRouter = require('./routes/folderRoutes');
+const fileRouter = require('./routes/fileRoutes');
+const TaskController = require('./controllers/TaskController');
 
 const DB_PATH = "mongodb+srv://task-manager:ssjy2311@cluster0.uxjmghk.mongodb.net/task-manager?appName=Cluster0";
 const port = 3000;
@@ -42,9 +46,10 @@ app.use(session({
     }
 }));
 
-// Set req.isLoggedIn from session for use in controllers
+// Set req.isLoggedIn and req.user from session for use in controllers
 app.use((req, res, next) => {
-    req.isLoggedIn = req.session.isLoggedIn;
+    req.isLoggedIn = req.session ? req.session.isLoggedIn || false : false;
+    req.user = req.session ? req.session.user || null : null;
     next();
 });
 
@@ -52,15 +57,8 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRouter);
 app.get('/auth-status', authController.getAuthStatus);
 app.post('/logout', authController.postLogout);
-
-// Debug endpoint - check raw session (remove in production)
-app.get('/debug-session', (req, res) => {
-    res.json({
-        sessionID: req.sessionID,
-        session: req.session,
-        cookies: req.headers.cookie
-    });
-});
+app.use('/api/folders', folderRouter);
+app.use('/api', fileRouter);
 
 mongoose.connect(DB_PATH)
     .then(() => {
